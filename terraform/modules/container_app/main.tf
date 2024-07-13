@@ -1,8 +1,8 @@
-resource "azurerm_user_assigned_identity" "example" {
-  name                = "acr-user"
-  resource_group_name = var.resource_group_name
-  location            = var.location
-}
+# resource "azurerm_user_assigned_identity" "example" {
+#   name                = "acr-user"
+#   resource_group_name = var.resource_group_name
+#   location            = var.location
+# }
 
 resource "azurerm_container_registry" "acr" {
   name                = var.container_registry_name
@@ -33,10 +33,10 @@ resource "azurerm_container_app" "example" {
   container_app_environment_id = azurerm_container_app_environment.example.id
   resource_group_name          = var.resource_group_name
   revision_mode                = "Single"
-  identity {
-    type = "UserAssigned"
-    identity_ids = [azurerm_user_assigned_identity.example.id]
-  }
+  # identity {
+  #   type = "UserAssigned"
+  #   identity_ids = [azurerm_user_assigned_identity.example.id]
+  # }
 
   template {
     container {
