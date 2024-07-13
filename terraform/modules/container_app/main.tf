@@ -1,3 +1,18 @@
+resource "azurerm_user_assigned_identity" "example" {
+  name                = "acr-user"
+  resource_group_name = var.resource_group_name
+  location            = var.location
+}
+
+resource "azurerm_container_registry" "acr" {
+  name                = var.container_registry_name
+  resource_group_name = var.resource_group_name
+  location            = var.location
+  sku                 = "Basic"
+  # sku                 = "Premium"
+  admin_enabled       = true
+}
+
 resource "azurerm_log_analytics_workspace" "example" {
   name                = "acctest-01"
   location            = var.location
@@ -18,6 +33,10 @@ resource "azurerm_container_app" "example" {
   container_app_environment_id = azurerm_container_app_environment.example.id
   resource_group_name          = var.resource_group_name
   revision_mode                = "Single"
+  identity {
+    type = "UserAssigned"
+    identity_ids = [azurerm_user_assigned_identity.example.id]
+  }
 
   template {
     container {
@@ -34,5 +53,15 @@ resource "azurerm_container_app" "example" {
       latest_revision = true
       percentage      = 100
     }
+  }
+  # https://github.com/hashicorp/terraform-provider-azurerm/issues/21766
+  secret {
+    name  = "registry-credentials"
+    value = azurerm_container_registry.acr.admin_password
+  }
+  registry {
+    server   = azurerm_container_registry.acr.login_server
+    username = azurerm_container_registry.acr.admin_username
+    password_secret_name = "registry-credentials"
   }
 }

@@ -10,6 +10,7 @@ locals {
   resource_group_name       = "rg-nukano0522-01"
   storage_account_name = "sanukano052201"
   ai_search_name = "aisearchnukano052201"
+  container_registry_name = "containerregistrynukano052201"
   container_app_name = "containerappnukano052201"
 }
 
@@ -19,16 +20,24 @@ module "resource_group" {
   location = var.location
 }
 
-module "storage_account" {
-  source = "./modules/storage_account"
-  storage_account_name = local.storage_account_name
-  resource_group_name = module.resource_group.name
-  location = var.location
-}
+# module "storage_account" {
+#   source = "./modules/storage_account"
+#   storage_account_name = local.storage_account_name
+#   resource_group_name = module.resource_group.name
+#   location = var.location
+# }
+
+# module "container_registry" {
+#   source = "./modules/container_registry"
+#   container_registry_name = local.container_registry_name
+#   resource_group_name = module.resource_group.name
+#   location = var.location
+# }
 
 module "container_app" {
   source = "./modules/container_app"
   container_app_name = local.container_app_name
+  container_registry_name = local.container_registry_name
   resource_group_name = module.resource_group.name
   location = var.location
 }

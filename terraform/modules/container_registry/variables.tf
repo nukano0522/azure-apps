@@ -3,11 +3,6 @@ variable "container_registry_name" {
   type        = string
 }
 
-variable "container_app_name" {
-  description = "The name of the Container App"
-  type        = string
-}
-
 variable "resource_group_name" {
   description = "The name of the resource group"
   type        = string
