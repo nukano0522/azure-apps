@@ -10,27 +10,35 @@ locals {
   resource_group_name       = "rg-nukano0522-01"
   storage_account_name = "sanukano052201"
   ai_search_name = "aisearchnukano052201"
+  container_app_name = "containerappnukano052201"
 }
 
-resource "azurerm_resource_group" "rg01" {
-  name     = local.resource_group_name
+module "resource_group" {
+  source = "./modules/resource_group"
+  resource_group_name = local.resource_group_name
   location = var.location
 }
 
-resource "azurerm_storage_account" "sa01" {
-  name                     = local.storage_account_name
-  resource_group_name      = azurerm_resource_group.rg01.name
-  location                 = azurerm_resource_group.rg01.location
-  account_tier             = "Standard"
-  account_replication_type = "LRS"
+module "storage_account" {
+  source = "./modules/storage_account"
+  storage_account_name = local.storage_account_name
+  resource_group_name = module.resource_group.name
+  location = var.location
 }
 
-// https://learn.microsoft.com/ja-jp/azure/search/search-get-started-terraform
-resource "azurerm_search_service" "search" {
-  name                = local.ai_search_name
-  resource_group_name = azurerm_resource_group.rg01.name
-  location            = azurerm_resource_group.rg01.location
-  sku                 = var.sku
-  replica_count       = var.replica_count
-  partition_count     = var.partition_count
+module "container_app" {
+  source = "./modules/container_app"
+  container_app_name = local.container_app_name
+  resource_group_name = module.resource_group.name
+  location = var.location
 }
+
+## https://learn.microsoft.com/ja-jp/azure/search/search-get-started-terraform
+# resource "azurerm_search_service" "search" {
+#   name                = local.ai_search_name
+#   resource_group_name = azurerm_resource_group.rg01.name
+#   location            = azurerm_resource_group.rg01.location
+#   sku                 = var.sku
+#   replica_count       = var.replica_count
+#   partition_count     = var.partition_count
+# }
